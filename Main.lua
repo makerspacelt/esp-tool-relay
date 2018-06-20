@@ -19,6 +19,7 @@ reCheckConnectionTimer = 0
 reCheckConnectionTimerLimit = 300
 macAddress = wifi.sta.getmac()
 header = ""
+-- End of config section
 
 function createConnection() --TODO: check if resets when failed
     print("Creating connection...")
