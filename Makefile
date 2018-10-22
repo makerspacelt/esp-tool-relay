@@ -7,7 +7,7 @@ flash: nodemcu.bin
 
 .PHONY: upload
 upload: $(FILES) reset
-	sudo nodemcu-uploader --baud 460800 upload $(FILES)
+	sudo nodemcu-uploader --baud 230400 upload $(FILES)
 
 .PHONY: run
 run:
