@@ -1,15 +1,24 @@
 FILES=Main.lua RC522.lua
 
 
+.PHONY: flash
 flash: nodemcu.bin
-	sudo esptool.py --port /dev/ttyUSB0 write_flash -fm dio 0x00000 $^
+	sudo esptool.py -b 460800 write_flash -fm dio 0x00000 $^
 
-upload: $(FILES)
-	sudo nodemcu-uploader --port=/dev/ttyUSB0 upload $^
+.PHONY: upload
+upload: $(FILES) reset
+	sudo nodemcu-uploader --baud 460800 upload $(FILES)
 
+.PHONY: run
 run:
-	sudo nodemcu-uploader --port=/dev/ttyUSB0 file do Main.lua
+	sudo nodemcu-uploader file do Main.lua
 
+.PHONY: connect
 connect:
-	sudo minicom --noinit -b 115200 -D /dev/ttyUSB0
+	sudo nodemcu-uploader terminal
+
+.PHONY: reset
+reset:
+	sudo esptool.py --no-stub read_mac
+
 
