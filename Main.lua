@@ -1,10 +1,12 @@
 require "RC522"
 
+require "Login1"
+
 --edit
 ID = nil
 station_cfg = {}
-station_cfg.ssid = "makerspace.lt"
-station_cfg.pwd = ""
+station_cfg.ssid = Login1.username
+station_cfg.pwd = Login1.password
 WifiConnectionRetryCount = 0
 timeEnabled = 0
 cardInserted = false
@@ -15,12 +17,27 @@ relayEnabled = false
 permission = false
 waitingForAnswer = false
 ttl = 10
+beepCount = 3
 connected = false
 reCheckConnectionTimer = 0
 reCheckConnectionTimerLimit = 10
 macAddress = wifi.sta.getmac()
-header = ""
+header = Login1.header
 -- End of config section
+
+--default pin states
+beeperPin = 0
+gpio.write(beeperPin, gpio.LOW)
+
+--beep(500, 1)
+
+function beep(duration)
+    --duration = duration *1000
+    gpio.write(beeperPin, gpio.HIGH)
+    tmr.create():alarm(duration, tmr.ALARM_SINGLE, function()
+      gpio.write(beeperPin, gpio.LOW) 
+    end)
+end
 
 function createConnection() --TODO: check if resets when failed
     print("Creating connection...")
@@ -75,8 +92,9 @@ function sendRequestToServer()
                     print("No data received from server")
                 end
                 waitingForAnswer = false
+                timeEnabled = 1
             end)
-         end
+         end   
     end
 end
 
@@ -87,9 +105,10 @@ function checkPermissionFromServer()
         print("Time enabled: ", timeEnabled)
         relayEnabled = true
     end
-
+   
     --disable relay
     if permission == false then
+        timeEnabled = 0
         relayEnabled = false
     end
 end
@@ -98,17 +117,11 @@ function getID()
     oldID = ID
     ID = RC522.get_ID() 
     if ID == nil or ID == "" then
-        --timeEnabled = 0
-        --requestGot = false
-        --permission = false
-        --cardInserted = false 
         if oldID ~= ID then 
             cardGone = true 
             print("Card gone!!!")
         end
     else
-        --cardInserted = true
-        --permission = true--for testing only
         cardGone = false
         cardGoneTimer = 0
         ID = appendHex(ID)
@@ -117,7 +130,7 @@ function getID()
 
     if cardGone == true then 
         cardGoneTimer = cardGoneTimer + 1
-        print("BEEP!")
+        if cardGoneTimer < beepCount + 1 then beep(500) end
     end
     if cardGoneTimer >= cardGoneTimerLimit then 
         cardGone = false 
@@ -142,27 +155,18 @@ function mainLoop()
         reCheckConnectionTimer = 0
         checkConnection() 
     end
-    
+    --print("waitingForAnswer ", waitingForAnswer)
     getID()
 
     --send and check request from server
-
     if waitingForAnswer == false then
         sendRequestToServer()
-    else
-        checkPermissionFromServer()
     end
+    checkPermissionFromServer()
       
-    if permission == true then timeEnabled = timeEnabled + 1 end
-
-    
     setRelay()
-
-
-    --TODO: move passwords to cfg, beeper
 end
     
-
 
 createConnection()
 
