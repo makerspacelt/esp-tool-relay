@@ -1,0 +1,10 @@
+Login1 = {}
+Login1.__index = Login1
+
+
+
+Login1.username = ""
+Login1.password = ""
+
+Login1.header = ""
+
