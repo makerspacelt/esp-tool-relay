@@ -10,7 +10,7 @@
 
       
 pin_rst = 3                 -- Enable/reset pin
-pin_ss = 4                  -- SS (marked as SDA) pin
+pin_ss = 8                  -- SS (marked as SDA) pin
 
 mode_idle = 0x00
 mode_auth = 0x0E
