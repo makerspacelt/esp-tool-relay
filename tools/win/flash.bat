@@ -1,0 +1,1 @@
+esptool.py --port $1 write_flash 0x0 nodemcu-2019-09-08.bin

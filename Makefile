@@ -1,4 +1,4 @@
-FILES=Main.lua RC522.lua Login1.lua
+FILES=init_.lua RC522.lua Login1.lua
 
 
 .PHONY: flash

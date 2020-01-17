@@ -10,7 +10,7 @@
 
       
 pin_rst = 3                 -- Enable/reset pin
-pin_ss = 4                  -- SS (marked as SDA) pin
+pin_ss = 8                  -- SS (marked as SDA) pin
 
 mode_idle = 0x00
 mode_auth = 0x0E
@@ -47,7 +47,7 @@ keyA = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }      --  this is the usual default
 RC522 = {}
 RC522.__index = RC522
 
-
+timer = tmr.create()
 
 
 --------------------------------------------------------
@@ -372,7 +372,7 @@ function RC522.get_ID()
     isTagNear, cardType = RC522.request()
     
     if isTagNear == true then
-      tmr.stop(0)
+      timer:stop()
       err, serialNo = RC522.anticoll()
       --print("Tag Found: "..appendHex(serialNo).."  of type: "..appendHex(cardType))
     
@@ -386,7 +386,7 @@ function RC522.get_ID()
       err, back_data, back_length = RC522.card_write(mode_transrec, buf)
       RC522.clear_bitmask(0x08, 0x08)    -- Turn off encryption
       
-      tmr.start(0)
+      timer:start()
 
       return serialNo
     else 
